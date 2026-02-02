@@ -821,10 +821,10 @@
         <div id="time-selection" style="display: none;">
             <div class="label">希望時間を選択してください。<span class="required">必須</span></div>
             <div class="menu-sections">
-                <button type="button" onclick="selectTime(0, this)">1時間（所要時間：60分）</button>
-                <button type="button" onclick="selectTime(60, this)">2時間（所要時間：120分）</button>
-                <button type="button" onclick="selectTime(120, this)">3時間（所要時間：180分）</button>
-                <button type="button" onclick="selectTime(180, this)">4時間（所要時間：240分）</button>
+                <button type="button" onclick="selectTime(60, this)">1時間（所要時間：60分）</button>
+                <button type="button" onclick="selectTime(120, this)">2時間（所要時間：120分）</button>
+                <button type="button" onclick="selectTime(180, this)">3時間（所要時間：180分）</button>
+                <button type="button" onclick="selectTime(240, this)">4時間（所要時間：240分）</button>
             </div>
         </div>
 
@@ -1563,7 +1563,7 @@
 
                     const slotEnd = new Date(slotStart);
                     let menuDuration = selectedMenuTime || 0;
-                    let visitDuration = selectedVisitTime || 60;
+                    let visitDuration = selectedVisitTime || 0;
                     let irradiationsDuration = selectedirradiationsTime || 0;
 
                     // メニュー時間と訪問回数の時間を合計して、終了時間を設定
@@ -1775,4 +1775,3 @@
 </body>
 
 </html>
-
