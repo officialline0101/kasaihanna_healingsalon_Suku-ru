@@ -684,8 +684,8 @@
             outline: 1px solid #2b2b2b;
             /* ここで枠線を指定 */
             outline-offset: 2px;
-    /* 外側に色を追加 */
-    box-shadow: 0 0 0 3px #aa52e0
+            /* 外側に色を追加 */
+            box-shadow: 0 0 0 3px #aa52e0
         }
 
         /* 必須マークのスタイル */
@@ -808,15 +808,25 @@
         <input type="tel" id="phone" placeholder="電話番号を入力してください" oninput="saveInput('phone')">
 
         <div class="label" id="course">どちらがご希望ですか？<span class="required">必須</span></div>
-        <div class="menu-sections">
-            <button type="button" onclick="showMenu('male')">対面</button>
-            <button type="button" onclick="showMenu('female')">オンライン</button>
+        <div class="visit-buttons">
+            <button type="button" id="btn-inperson" onclick="selectType('対面')">対面</button>
+            <button type="button" id="btn-online" onclick="selectType('オンライン')">オンライン</button>
         </div>
 
-        <div id="female" class="menu-section">
-        <div class="label">メールアドレス<span class="required">必須</span></div>
-        <input type="text" id="gmail" placeholder="メールアドレスを入力してください" oninput="saveInput('gmail')">
+        <div id="email-section" style="display: none;">
+            <div class="label">メールアドレス<span class="required">必須</span></div>
+            <input type="text" id="gmail" placeholder="メールアドレスを入力してください" oninput="saveInput('gmail')">
+        </div>
+
+        <div id="time-selection" style="display: none;">
+            <div class="label">希望時間を選択してください。<span class="required">必須</span></div>
+            <div class="menu-sections">
+                <button type="button" onclick="selectTime(0, this)">1時間（所要時間：60分）</button>
+                <button type="button" onclick="selectTime(60, this)">2時間（所要時間：120分）</button>
+                <button type="button" onclick="selectTime(120, this)">3時間（所要時間：180分）</button>
+                <button type="button" onclick="selectTime(180, this)">4時間（所要時間：240分）</button>
             </div>
+        </div>
 
         <div id="treatment-text" style="display: none; margin-bottom: 10px;"></div>
 
@@ -869,7 +879,7 @@
         <div class="labeltyuuou">ご予約内容</div>
         <div id="displayInfo"></div> <!-- ここに選択された情報を表示します -->
 
-<div class="info-text">※全て記載の上送って頂きますようお願いします。<br>記入漏れがございましたらご予約がお取り出来ません。</div>
+        <div class="info-text">※全て記載の上送って頂きますようお願いします。<br>記入漏れがございましたらご予約がお取り出来ません。</div>
 
         <button class="submit-button" onclick="submitForm()" div id="section-message">予約を行う</button>
     </div>
@@ -915,8 +925,8 @@
         let selectedirradiationsTime = 0; // 訪問回数で選択された時間
 
         let menuTimes = {
-            '対面': 60,
-            'オンライン': 60,
+            '対面': 0,
+            'オンライン': 0,
         };
 
         let selectedMenuTime = 0;
@@ -988,36 +998,36 @@
                 showMenu(savedMenu);
             }
 
-    // ✅ 「お相手の生年月日」入力欄へスクロール
-    const targetElement = document.getElementById('youbirth');
-    if (targetElement) {
-        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
-}
+            // ✅ 「お相手の生年月日」入力欄へスクロール
+            const targetElement = document.getElementById('youbirth');
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
 
-function updateDisplayInfo() {
-    const name = document.getElementById('name').value;
-    const namehurigana = document.getElementById('namehurigana').value;
-    const phone = document.getElementById('phone').value;
-    const labelStyle = "color:#0c0c0c; font-size:14px; border:1px solid #0c0c0c; padding:0px 3px; border-radius:4px;";
+        function updateDisplayInfo() {
+            const name = document.getElementById('name').value;
+            const namehurigana = document.getElementById('namehurigana').value;
+            const phone = document.getElementById('phone').value;
+            const labelStyle = "color:#0c0c0c; font-size:14px; border:1px solid #0c0c0c; padding:0px 3px; border-radius:4px;";
 
-    const selectedMenuText = selectedMenu
-        ? `<span style="${labelStyle}"><strong>希望</strong></span> ${selectedMenu}`
-        : '・希望が未選択です';
+            const selectedMenuText = selectedMenu
+                ? `<span style="${labelStyle}"><strong>希望</strong></span> ${selectedMenu}`
+                : '・希望が未選択です';
 
-    let totalMinutes = selectedMenuTime + selectedirradiationsTime + selectedVisitTime;
-    let hours = Math.floor(totalMinutes / 60);
-    let minutes = totalMinutes % 60;
-    let totalTimeText = `<span style="${labelStyle}"><strong>所要時間</strong></span> ${hours > 0 ? hours + '時間' : ''}${minutes}分`;
+            let totalMinutes = selectedMenuTime + selectedirradiationsTime + selectedVisitTime;
+            let hours = Math.floor(totalMinutes / 60);
+            let minutes = totalMinutes % 60;
+            let totalTimeText = `<span style="${labelStyle}"><strong>所要時間</strong></span> ${hours > 0 ? hours + '時間' : ''}${minutes}分`;
 
-    const totalAmountText = `<span style="${labelStyle}"><strong>合計金額</strong></span> ¥${menuPrice + optionsPrice}`;
+            const totalAmountText = `<span style="${labelStyle}"><strong>合計金額</strong></span> ¥${menuPrice + optionsPrice}`;
 
-    const selectedDateText = selectedFullDate
-        ? `<span style="${labelStyle}"><strong>希望日時</strong></span> ${selectedFullDate}`
-        : '・日時が未選択です';
+            const selectedDateText = selectedFullDate
+                ? `<span style="${labelStyle}"><strong>希望日時</strong></span> ${selectedFullDate}`
+                : '・日時が未選択です';
 
-    // 修正ボタン付きのHTMLを作成
-    document.getElementById('displayInfo').innerHTML = `
+            // 修正ボタン付きのHTMLを作成
+            document.getElementById('displayInfo').innerHTML = `
         <div class="info-row">
             <p><span style="${labelStyle}"><strong>お名前</strong></span> ${name}</p>
             <button class="edit-button" onclick="scrollToElement('name')">修正</button>
@@ -1036,6 +1046,11 @@ function updateDisplayInfo() {
         <div class="info-row">
             <p>${selectedMenuText}</p>
             <button class="edit-button" onclick="scrollToElement('course')">修正</button>
+        </div>
+        <hr>
+         <div class="info-row">
+            <p>${totalTimeText}</p>
+            <button class="edit-button" onclick="scrollToElement('time-selection')">修正</button>
         </div>
         <hr>
         <div class="info-row">
@@ -1210,27 +1225,27 @@ function updateDisplayInfo() {
             updateDisplayInfo(); // 表示を更新
         }
 
-function selectVisit(element) {
-    // 選択された日時をリセット
-    selectedFullDate = '';
+        function selectVisit(element) {
+            // 選択された日時をリセット
+            selectedFullDate = '';
 
-    // ボタンの状態をリセット
-    document.getElementById('firstVisit').classList.remove('active');
-    document.getElementById('repeatVisit').classList.remove('active');
-    element.classList.add('active');
+            // ボタンの状態をリセット
+            document.getElementById('firstVisit').classList.remove('active');
+            document.getElementById('repeatVisit').classList.remove('active');
+            element.classList.add('active');
 
-    visitCount = element.innerText;
+            visitCount = element.innerText;
 
-    // ✅ 選択状態を localStorage に保存
-    localStorage.setItem('selectedVisit', element.id);
+            // ✅ 選択状態を localStorage に保存
+            localStorage.setItem('selectedVisit', element.id);
 
-    // 選択された訪問回数に対応する時間を取得
-    selectedVisitTime = visitTimes[visitCount];
-    console.log('選択された訪問回数の時間:', selectedVisitTime);
+            // 選択された訪問回数に対応する時間を取得
+            selectedVisitTime = visitTimes[visitCount];
+            console.log('選択された訪問回数の時間:', selectedVisitTime);
 
-    // カレンダーを更新するために取得する日付を渡す
-    fetchAvailability(currentDate);
-}
+            // カレンダーを更新するために取得する日付を渡す
+            fetchAvailability(currentDate);
+        }
 
         // メニューの選択を保存する関数
         function selectMenu(element) {
@@ -1248,73 +1263,84 @@ function selectVisit(element) {
             localStorage.setItem('selectedMenus', JSON.stringify(selectedMenus));
         }
 
-        function showMenu(menu) {
-            // treatment-text を非表示にする
-            document.getElementById("treatment-text").style.display = "none";
+        // タイプ選択（対面/オンライン）
+        function selectType(type) {
+            selectedMenu = type;
+            localStorage.setItem('selectedMenu', type);
 
-            // 選択されたメニューの名前を取得
-            let selectedButton = document.querySelector(`.menu-sections button[onclick="showMenu('${menu}')"]`);
+            // ボタンのハイライト
+            document.getElementById('btn-inperson').classList.remove('active');
+            document.getElementById('btn-online').classList.remove('active');
 
-            if (selectedButton) {
-                selectedMenu = selectedButton.innerText;
+            if (type === '対面') {
+                document.getElementById('btn-inperson').classList.add('active');
+                document.getElementById('email-section').style.display = 'none';
+            } else {
+                document.getElementById('btn-online').classList.add('active');
+                document.getElementById('email-section').style.display = 'block';
             }
 
-            // ✅ ローカルストレージにメニュー識別子を保存（追加）
-            localStorage.setItem('selectedMenu', menu); // ←この行を追加！
+            // 時間選択を表示
+            document.getElementById('time-selection').style.display = 'block';
 
-            // すべてのメニューボタンの選択状態をリセット
-            document.querySelectorAll('.menu-sections button').forEach(button => {
-                button.classList.remove('active');
-            });
+            // 時間選択のリセットはしない（ユーザーが選び直すかもしれないので、そのままにするか、あるいはリセットするか。
+            // ここではリセットせず、以前の選択があれば維持するが、見た目の整合性のために時間を未選択にするなら以下を追加）
+            // resetTimeSelection(); 
 
-            // 選択されたメニューセクションを非表示＋ボタン状態リセット
-            document.querySelectorAll('.menu-section').forEach(section => {
-                section.classList.remove('active');
-                section.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
-            });
-
-            // 対応するメニューボタンを選択状態にする
-            if (selectedButton) {
-                selectedButton.classList.add('active');
-                selectMenu(selectedButton);
-            }
-
-            // 選択されたメニューセクションを表示
-            document.getElementById(menu).classList.add('active');
-
-            // treatment-text の内容をリセット
-            document.getElementById("treatment-text").innerHTML = "";
-
-            // メニューとオプションをリセット
-            selectedSymptom = '';      // メニューのリセット
-            irradiationsCount = '';    // オプションのリセット
-            menuPrice = 0;             // メニューの価格リセット
-            optionsPrice = 0;          // オプションの価格リセット
-            totalAmount = 0;           // 合計金額リセット
-
-            // 表示を更新
             updateDisplayInfo();
         }
 
-document.addEventListener("DOMContentLoaded", () => {
-    // visit復元
-    const savedVisit = localStorage.getItem('selectedVisit');
-    if (savedVisit) {
-        const visitButton = document.getElementById(savedVisit);
-        if (visitButton) {
-            selectVisit(visitButton);
-        }
-    }
+        // 時間選択
+        function selectTime(minutes, button) {
+            selectedMenuTime = minutes;
 
-    // menu復元（元からある処理）
-    let selectedMenus = JSON.parse(localStorage.getItem('selectedMenus') || '[]');
-    selectedMenus.forEach(menuId => {
-        let menuButton = document.getElementById(menuId);
-        if (menuButton) {
-            menuButton.classList.add('selected');
+            // ボタンのハイライト切り替え
+            const timeButtons = document.querySelectorAll('#time-selection .menu-sections button');
+            timeButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            // 日時リセット（時間が変われば空き状況も変わるため）
+            selectedFullDate = '';
+
+            // カレンダー更新
+            fetchAvailability(currentDate);
+            updateDisplayInfo();
         }
-    });
-});
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // 復元処理
+            const savedMenu = localStorage.getItem('selectedMenu');
+            if (savedMenu) {
+                selectType(savedMenu);
+            }
+            // 時間の復元は複雑になるため、今回はTypeのみ復元で十分と判断
+        });
+
+        /*
+        function showMenu(menu) {
+            // ... (Removed old logic)
+        }
+        */
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // visit復元
+            const savedVisit = localStorage.getItem('selectedVisit');
+            if (savedVisit) {
+                const visitButton = document.getElementById(savedVisit);
+                if (visitButton) {
+                    selectVisit(visitButton);
+                }
+            }
+
+            // menu復元（元からある処理）
+            let selectedMenus = JSON.parse(localStorage.getItem('selectedMenus') || '[]');
+            selectedMenus.forEach(menuId => {
+                let menuButton = document.getElementById(menuId);
+                if (menuButton) {
+                    menuButton.classList.add('selected');
+                }
+            });
+        });
 
         function selectDate(cell) {
             // "unavailable" クラスが付いている場合はクリックを無効化
@@ -1341,65 +1367,80 @@ document.addEventListener("DOMContentLoaded", () => {
             updateDisplayInfo();
         }
 
-function submitForm() {
-    const formData = {
-        name: document.getElementById('name').value.trim(),
-        namehurigana: document.getElementById('namehurigana').value.trim(),
-        phone: document.getElementById('phone').value.trim(),
-        gmail: document.getElementById('gmail').value.trim(),
-        visitCount: visitCount,
-        selectedMenu: selectedMenu,
-        dates: selectedFullDate ? [selectedFullDate] : null, // 空チェック
-        message: document.getElementById('message').value.trim()
-    };
+        function submitForm() {
+            const formData = {
+                name: document.getElementById('name').value.trim(),
+                namehurigana: document.getElementById('namehurigana').value.trim(),
+                phone: document.getElementById('phone').value.trim(),
+                gmail: document.getElementById('gmail').value.trim(),
+                visitCount: visitCount,
+                selectedMenu: selectedMenu,
+                selectedMenuTime: selectedMenuTime,
+                dates: selectedFullDate ? [selectedFullDate] : null, // 空チェック
+                message: document.getElementById('message').value.trim()
+            };
 
-    // フォームデータのチェック
-    if (!formData.name) {
-        alert('（フルネーム/漢字）を入力してください。');
-        return;
-    }
-    if (!formData.namehurigana) {
-        alert('（フルネーム/ふりがな）を入力してください。');
-        return;
-    }
-    if (!formData.phone) {
-        alert('電話番号を入力してください。');
-        return;
-    }
+            // フォームデータのチェック
+            if (!formData.name) {
+                alert('（フルネーム/漢字）を入力してください。');
+                return;
+            }
+            if (!formData.namehurigana) {
+                alert('（フルネーム/ふりがな）を入力してください。');
+                return;
+            }
+            if (!formData.phone) {
+                alert('電話番号を入力してください。');
+                return;
+            }
 
-    if (!formData.selectedMenu) {
-        alert('希望を選択してください。');
-        return;
-    }
-    if (!formData.dates) {
-        alert('希望日時を選択してください。');
-        return;
-    }
+            if (!formData.selectedMenu) {
+                alert('希望（対面/オンライン）を選択してください。');
+                return;
+            }
+            if (!formData.selectedMenuTime) {
+                alert('希望時間を選択してください。');
+                return;
+            }
+            if (!formData.dates) {
+                alert('希望日時を選択してください。');
+                return;
+            }
 
-    // gmailが空なら行を入れない
-    const gmailLine = formData.gmail ? `\nメールアドレス：${formData.gmail}` : '';
+            // gmailが空なら行を入れない
+            const gmailLine = formData.gmail ? `\nメールアドレス：${formData.gmail}` : '';
 
-    const messageText =
-        `【スクール予約フォーム】\n` +
-        `予約：スクール\n` +
-        `お名前：${formData.name}\n` +
-        `お名前（フリガナ）：${formData.namehurigana}\n` +
-        `電話番号：${formData.phone}\n` +
-        `どちらがご希望ですか？：${formData.selectedMenu}` +
-        `${gmailLine}\n` +
-        `希望日時：\n ${formData.dates[0]}\n` +
-        `メッセージ：${formData.message}`;
+            // 時間の表示用文字列
+            const timeMap = {
+                60: '1時間（所要時間：60分）',
+                120: '2時間（所要時間：120分）',
+                180: '3時間（所要時間：180分）',
+                240: '4時間（所要時間：240分）'
+            };
+            const timeText = timeMap[formData.selectedMenuTime] || `${formData.selectedMenuTime}分`;
 
-    // LINEトークにメッセージを送信
-    liff.sendMessages([{
-        type: 'text',
-        text: messageText
-    }]).then(() => {
-        alert('当日キャンセルは無いようにお願いいたします。');
-        liff.closeWindow();
-    }).catch((err) => {
-        console.error('メッセージの送信に失敗しました', err);
-    });
+            const messageText =
+                `【スクール予約フォーム】\n` +
+                `予約：スクール\n` +
+                `お名前：${formData.name}\n` +
+                `お名前（フリガナ）：${formData.namehurigana}\n` +
+                `電話番号：${formData.phone}\n` +
+                `どちらがご希望ですか？：${formData.selectedMenu}\n` +
+                `希望時間：${timeText}` +
+                `${gmailLine}\n` +
+                `希望日時：\n ${formData.dates[0]}\n` +
+                `メッセージ：${formData.message}`;
+
+            // LINEトークにメッセージを送信
+            liff.sendMessages([{
+                type: 'text',
+                text: messageText
+            }]).then(() => {
+                alert('当日キャンセルは無いようにお願いいたします。');
+                liff.closeWindow();
+            }).catch((err) => {
+                console.error('メッセージの送信に失敗しました', err);
+            });
         }
 
         function formatDate(dateStr) {
@@ -1735,5 +1776,3 @@ function submitForm() {
 </body>
 
 </html>
-
-
